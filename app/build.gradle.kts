@@ -91,4 +91,15 @@ dependencies {
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
     implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+
+    // Compose Core
+    implementation("androidx.compose.ui:ui:1.7.5")
+    implementation("androidx.compose.material3:material3:1.3.1")
+    implementation("androidx.activity:activity-compose:1.9.3")
+
+    // Navigation for Compose
+    implementation("androidx.navigation:navigation-compose:2.8.4")
+
+    // Tooling for Compose Preview
+    implementation("androidx.compose.ui:ui-tooling-preview:1.7.5")
 }
