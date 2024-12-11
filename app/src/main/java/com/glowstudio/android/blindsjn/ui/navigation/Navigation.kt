@@ -1,5 +1,11 @@
 package com.glowstudio.android.blindsjn.ui.navigation
 
+/**
+ * 스크린 간 전환 로직
+ *
+ * TODO: 남은 스크린 구현
+ **/
+
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -14,6 +20,7 @@ import com.glowstudio.android.blindsjn.ui.screens.ProfileScreen
 
 @Composable
 fun AppNavHost(navController: NavHostController) {
+
     NavHost(
         navController = navController,
         startDestination = "login"

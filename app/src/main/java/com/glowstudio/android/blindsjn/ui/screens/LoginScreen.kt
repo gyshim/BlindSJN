@@ -1,5 +1,11 @@
 package com.glowstudio.android.blindsjn.ui.screens
 
+/**
+ * 로그인 스크린 로직
+ *
+ * TODO: 자동로그인 체크 박스
+ **/
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
@@ -15,19 +21,49 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.glowstudio.android.blindsjn.network.LoginRequest
+import com.glowstudio.android.blindsjn.network.RetrofitInstance
 import com.glowstudio.android.blindsjn.R
+
+import kotlinx.coroutines.launch
+import android.util.Log
+
+suspend fun login(phoneNumber: String, password: String): Boolean {
+    val request = LoginRequest(phoneNumber, password)
+    val response = RetrofitInstance.api.login(request)
+
+    //서버 통신 연결 확인 디버깅 코드
+//    Log.d("LoginScreen", "Sending Request Data: $request")
+//    Log.d("LoginScreen", "Response code: ${response.code()}")
+//    Log.d("LoginScreen", "Response body: ${response.body()}")
+
+    return if (response.isSuccessful) {
+        val result = response.body()
+        Log.d("LoginScreen", "Login result: $result")
+        result?.status == "success"
+    } else {
+        Log.e("LoginScreen", "Error: ${response.errorBody()?.string()}")
+        false
+    }
+}
 
 @Composable
 fun LoginScreen(
-    onLoginClick: () -> Unit,
+    onLoginClick: (Boolean) -> Unit,
     onSignupClick: () -> Unit,
     onForgotPasswordClick: () -> Unit
 ) {
-    // 상태 변수
+    //로그인 로직 변수
     var phoneNumber by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
+
+    //팝업 스크린 변수
+    var showEmptyFieldsPopup by remember { mutableStateOf(false) }
+    var showInvalidCredentialsPopup by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -93,13 +129,60 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             // 로그인 버튼
+            // 로그인 버튼 눌렀을 때 서버랑 통신 후 인증
             Button(
-                onClick = onLoginClick,
+                onClick = {
+                    coroutineScope.launch {
+                        if (phoneNumber.isEmpty() || password.isEmpty()) {
+                            showEmptyFieldsPopup = true // 텍스트필드 공백 팝업
+                        } else {
+                            try {
+                                val success = login(phoneNumber, password)
+                                if (success) {
+                                    onLoginClick(true) // 홈 화면으로 이동
+                                } else {
+                                    showInvalidCredentialsPopup = true //계정정보 팝업
+                                }
+                            } catch (e: Exception) {
+                                Log.e("LoginScreen", "Login error: ${e.message}", e)
+                                showInvalidCredentialsPopup = true //계정정보 팝업
+                            }
+                        }
+                    }
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(48.dp)
             ) {
                 Text("로그인")
+            }
+
+            // 로그인 실패시 팝업 표시
+            // 텍스트필드가 비었을 때 출력
+            if (showEmptyFieldsPopup) {
+                AlertDialog(
+                    onDismissRequest = { showEmptyFieldsPopup = false },
+                    title = { Text("입력 오류") },
+                    text = { Text("전화번호와 비밀번호를 입력해주세요.") },
+                    confirmButton = {
+                        TextButton(onClick = { showEmptyFieldsPopup = false }) {
+                            Text("확인")
+                        }
+                    }
+                )
+            }
+            // 계정정보가 서버와 옳지 않을 때 출력
+            if (showInvalidCredentialsPopup) {
+                AlertDialog(
+                    onDismissRequest = { showInvalidCredentialsPopup = false },
+                    title = { Text("로그인 실패") },
+                    text = { Text("전화번호 또는 비밀번호가 올바르지 않습니다.") },
+                    confirmButton = {
+                        TextButton(onClick = { showInvalidCredentialsPopup = false }) {
+                            Text("확인")
+                        }
+                    }
+                )
             }
 
             Spacer(modifier = Modifier.height(8.dp))

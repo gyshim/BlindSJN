@@ -83,4 +83,34 @@ dependencies {
 
     // Json serialization (DB 전송하려면 필요함)
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+
+    //Retrofit library (서버 통신에 필요)
+    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+
+    // Compose Core
+    implementation("androidx.compose.ui:ui:1.7.5")
+    implementation("androidx.compose.material3:material3:1.3.1")
+    implementation("androidx.activity:activity-compose:1.9.3")
+
+    // Navigation for Compose
+    implementation("androidx.navigation:navigation-compose:2.8.4")
+
+    // Tooling for Compose Preview
+    implementation("androidx.compose.ui:ui-tooling-preview:1.7.5")
+
+    // Icons
+    implementation("androidx.compose.material3:material3:1.3.1")
+    implementation("androidx.compose.material:material-icons-core:1.7.5")
+    implementation("androidx.compose.material:material-icons-extended:1.7.5")
+
+    // Navigation
+    implementation ("androidx.navigation:navigation-compose:2.8.4")
+    androidTestImplementation("androidx.navigation:navigation-testing:2.8.4")
+
+    // Json serialization (DB 전송하려면 필요함)
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
 }
