@@ -53,7 +53,8 @@ suspend fun login(phoneNumber: String, password: String): Boolean {
 fun LoginScreen(
     onLoginClick: (Boolean) -> Unit,
     onSignupClick: () -> Unit,
-    onForgotPasswordClick: () -> Unit
+    onForgotPasswordClick: () -> Unit,
+    isTestMode: Boolean = true // 테스트 시, true 설정하면 로그인 버튼 누를 시, 메인으로 넘어감
 ) {
     //로그인 로직 변수
     var phoneNumber by remember { mutableStateOf("") }
@@ -132,20 +133,25 @@ fun LoginScreen(
             // 로그인 버튼 눌렀을 때 서버랑 통신 후 인증
             Button(
                 onClick = {
-                    coroutineScope.launch {
-                        if (phoneNumber.isEmpty() || password.isEmpty()) {
+                    if (isTestMode) {
+                        // 테스트 모드일 경우 바로 다음 화면으로 이동
+                        onLoginClick(true)
+                    } else {
+                     coroutineScope.launch {
+                            if (phoneNumber.isEmpty() || password.isEmpty()) {
                             showEmptyFieldsPopup = true // 텍스트필드 공백 팝업
-                        } else {
-                            try {
-                                val success = login(phoneNumber, password)
-                                if (success) {
-                                    onLoginClick(true) // 홈 화면으로 이동
-                                } else {
+                          } else {
+                              try {
+                                   val success = login(phoneNumber, password)
+                                   if (success) {
+                                      onLoginClick(true) // 홈 화면으로 이동
+                                  } else {
+                                        showInvalidCredentialsPopup = true //계정정보 팝업
+                                  }
+                                } catch (e: Exception) {
+                                    Log.e("LoginScreen", "Login error: ${e.message}", e)
                                     showInvalidCredentialsPopup = true //계정정보 팝업
                                 }
-                            } catch (e: Exception) {
-                                Log.e("LoginScreen", "Login error: ${e.message}", e)
-                                showInvalidCredentialsPopup = true //계정정보 팝업
                             }
                         }
                     }
